@@ -1,16 +1,17 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import axios from "axios";
 
 function App() {
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const pdfRef = useRef();
+  const aRef = useRef();
   const [error, setError] = useState(false);
   const [roll, setRoll] = useState();
   const [year, setYear] = useState();
   const [part, setPart] = useState();
   const [type, setType] = useState();
-
+  const [pdfLink, setPdfLink] = useState();
   const fetchPdf = async () => {
     try {
       const response = await axios.get(
@@ -29,6 +30,7 @@ function App() {
       const url = URL.createObjectURL(blob);
 
       pdfRef.current.src = url;
+      setPdfLink(url);
     } catch (error) {
       setError(true);
       setTimeout(() => {
@@ -41,6 +43,10 @@ function App() {
     e.preventDefault();
     fetchPdf();
   }
+
+  useEffect(() => {
+    aRef.current.click();
+  }, [pdfLink]);
 
   return (
     <div className="xsm:mx-4 lg:mx-8 overflow-x-hidden">
@@ -56,7 +62,7 @@ function App() {
         <h1 className="xsm:text-2xl md:text-3xl lg:text-4xl">PPU RESULTS</h1>
       </div>
 
-      <form className="w-full mt-4 mb-8 ">
+      <form className="w-full mt-4 mb-8 flex-col md:flex-row ">
         <div className="flex ">
           <input
             type="text"
@@ -148,8 +154,10 @@ function App() {
       <iframe
         ref={pdfRef}
         title="PDF Viewer"
-        className="w-full xsm:h-96 md:h-screen mb-8"
+        className="xsm:hidden xl:block w-full xsm:h-96 md:h-screen mb-8"
       ></iframe>
+
+      <a href={pdfLink} download="Result" ref={aRef}></a>
 
       <div className="text-gray-500">
         <p>Made by Ankit Kashyap For Fun</p>
